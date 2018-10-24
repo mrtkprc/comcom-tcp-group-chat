@@ -7,16 +7,26 @@ class Client():
         1 == 1
 
     def __init__(self,serverName,serverPort):
+        self.nickname = input("Enter your nickname: ")
         self.serverName = serverName
         self.serverPort = serverPort
-        self.clientSocket = socket(AF_INET,SOCK_STREAM)
-        self.clientSocket.connect((self.serverName,self.serverPort))
+        try:
+            self.clientSocket = socket(AF_INET,SOCK_STREAM)
+        except:
+            print("Socket could not be opened.")
+            return    
+
+        try:
+            self.clientSocket.connect((self.serverName,self.serverPort))
+        except:
+            print("Socket could not connect to server. Please, make sure whether server is working")
+            return    
+
+        self.clientSocket.send(("<!NEW_USER!>:"+self.nickname).encode())
+        time.sleep(1)
         IncomingFromServer(self.clientSocket).start()
-        Listen2Client(self.clientSocket).start()
-
-
-        #while True:
-        #    1 == 1
+        Send2Others(self.clientSocket,self.nickname).start()
+        
 
 class IncomingFromServer(threading.Thread):
     def __init__(self,clientSocket):
@@ -25,25 +35,36 @@ class IncomingFromServer(threading.Thread):
 
     def run(self):
         while True:
+            incomingMessage = ""
+            try:
+                responseFromServer=self.clientSocket.recv(1024)
+                incomingMessage = responseFromServer.decode("utf-8")
+            except ConnectionResetError:
+                time.sleep(1)
+                return
+            except:
+                print("An error occured in receiving message")    
             
-            responseFromServer=self.clientSocket.recv(1024)
-            incomingMessage = responseFromServer.decode("utf-8")
-            print("\n"+incomingMessage)
+            print("\n"+incomingMessage,end="")
             time.sleep(1)
 
-class Listen2Client(threading.Thread):
-    def __init__(self,clientSocket):
+class Send2Others(threading.Thread):
+    def __init__(self,clientSocket,nickname):
         threading.Thread.__init__(self)
         self.clientSocket = clientSocket
-
+        self.nickname = nickname
 
     def run(self):
         while True:
-            choice = input("Enter Your Message: ")
-            self.clientSocket.send(choice.encode())
-            
-
-            
+            message = input("[You]: ")
+            try:
+                self.clientSocket.send(message.encode())
+            except ConnectionResetError:
+                time.sleep(1)
+                return
+            except:
+                print("An error occured in sending message")    
+                        
 
 if __name__=="__main__":
     serverName="192.168.1.25"
