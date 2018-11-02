@@ -38,7 +38,7 @@ class ThreadedServer():
             count += 1
             m_clientList.append(client)
             m_addrList.append(addr)
-            print("Current Client Count: ", count)
+            time.sleep(1)
             ClientWithThread(count,client,addr).start()
         
 class ClientWithThread (threading.Thread):
@@ -83,4 +83,3 @@ def SendMessageEveryone(portID,message,senderNickName):
 if __name__=="__main__":
     serverPort=12000
     ThreadedServer(serverPort)
-
