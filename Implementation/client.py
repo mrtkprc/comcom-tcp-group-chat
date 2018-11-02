@@ -3,9 +3,6 @@ import threading
 import time
 
 class Client():
-    def PrintMenu(self):
-        1 == 1
-
     def __init__(self,serverName,serverPort):
         self.nickname = input("Enter your nickname: ")
         self.serverName = serverName
@@ -67,6 +64,6 @@ class Send2Others(threading.Thread):
                         
 
 if __name__=="__main__":
-    serverName="192.168.1.25"
+    serverName="localhost"
     serverPort=12000
     Client(serverName,serverPort)    

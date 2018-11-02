@@ -1,4 +1,5 @@
 from socket import *
+from datetime import datetime
 import threading
 import time
 m_addrList = []
@@ -69,7 +70,7 @@ def SendMessageEveryone(portID,message,senderNickName):
         if(addr[1] != portID):
             try:
                 sendingMessage = message.decode("utf-8")
-                sendingMessage = senderNickName+": "+sendingMessage
+                sendingMessage = senderNickName+": "+sendingMessage + " <"+datetime.strftime(datetime.now(),'%X')+">"
                 m_clientList[i].send(sendingMessage.encode())
             except ConnectionResetError:
                 time.sleep(1)
